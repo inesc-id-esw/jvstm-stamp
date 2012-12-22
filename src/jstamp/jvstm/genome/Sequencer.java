@@ -388,9 +388,6 @@ public class Sequencer {
 	    }
 	};
 	Transaction.transactionallyDo(cmd);
-	if (cmd.getAborts() > 0) {
-	    aborts5.addAndGet(cmd.getAborts());
-	}
     }
 
     // @Atomic
@@ -403,9 +400,6 @@ public class Sequencer {
 	    }
 	};
 	Transaction.transactionallyDo(cmd);
-	if (cmd.getAborts() > 0) {
-	    aborts4.addAndGet(cmd.getAborts());
-	}
     }
 
     // @Atomic
@@ -418,9 +412,6 @@ public class Sequencer {
 	    }
 	};
 	Transaction.transactionallyDo(cmd);
-	if (cmd.getAborts() > 0) {
-	    aborts3.addAndGet(cmd.getAborts());
-	}
     }
 
     // @Atomic
@@ -439,21 +430,12 @@ public class Sequencer {
 		}
 	    };
 	    int t = Transaction.doIt(cmd);
-	    if (cmd.getAborts() > 0) {
-		aborts2.addAndGet(cmd.getAborts());
-	    }
 	    return t;
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    return -1;
 	}
     }
-
-    public static final AtomicInteger aborts1 = new AtomicInteger(0);
-    public static final AtomicInteger aborts2 = new AtomicInteger(0);
-    public static final AtomicInteger aborts3 = new AtomicInteger(0);
-    public static final AtomicInteger aborts4 = new AtomicInteger(0);
-    public static final AtomicInteger aborts5 = new AtomicInteger(0);
 
     // @Atomic
     private static void atomicMethodOne(final Hashtable uniqueSegmentsPtr,
@@ -473,9 +455,6 @@ public class Sequencer {
 		}
 	    };
 	    Transaction.transactionallyDo(cmd);
-	    if (cmd.getAborts() > 0) {
-		aborts1.addAndGet(cmd.getAborts());
-	    }
 	}
     }
 

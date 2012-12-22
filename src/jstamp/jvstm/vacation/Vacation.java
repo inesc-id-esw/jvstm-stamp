@@ -213,8 +213,6 @@ public class Vacation {
 	// System.out.println("done.");
     }
 
-    public static final AtomicInteger aborts = new AtomicInteger(0);
-    
     public static void main(String argv[]) throws InterruptedException {
 	Manager manager;
 	Client clients[];
@@ -247,7 +245,7 @@ Transaction.beginInevitable();
 
 	// System.out.print("done.");
 	long diff = stop - start;
-	System.out.println(diff + " " + aborts.get());
+	System.out.println(diff);
 //	Stats stats = new Stats();
 //	stats.addStats(clients[0].stats);
 //	for (int i = 1; i < numThread; i++) {

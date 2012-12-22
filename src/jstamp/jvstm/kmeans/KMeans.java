@@ -280,7 +280,7 @@ Transaction.commit();
           g_args);                // Global arguments common to all threads
     }
 
-    System.out.println(g_args.global_time + " " + Normal.aborts.get());
+    System.out.println(g_args.global_time);
 
 //    System.out.println("Printing output......");
 //    System.out.println("Best_nclusters= " + kms.best_nclusters);

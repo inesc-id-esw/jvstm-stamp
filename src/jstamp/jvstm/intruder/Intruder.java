@@ -235,10 +235,6 @@ public class Intruder extends Thread {
 
     }
 
-    public static final AtomicInteger abortsPacket = new AtomicInteger(0);
-    public static final AtomicInteger abortsProcess = new AtomicInteger(0);
-    public static final AtomicInteger abortsComplete = new AtomicInteger(0);
-    
     //    @Atomic
     private byte[] atomicGetComplete(final Decoder decoderPtr, final int[] decodedFlowId) {
 	try {
@@ -251,9 +247,6 @@ public class Intruder extends Thread {
 		}
 	    };
 	    byte[] r = Transaction.doIt(cmd);
-	    if (cmd.getAborts() > 0) {
-		abortsComplete.addAndGet(cmd.getAborts());
-	    }
 	    return r;
 	} catch (Exception e) {
 	    e.printStackTrace();
@@ -269,9 +262,6 @@ public class Intruder extends Thread {
 	    }
 	};
 	Transaction.transactionallyDo(cmd);
-	if (cmd.getAborts() > 0) {
-	    abortsProcess.addAndGet(cmd.getAborts());
-	}
     }
 
     //    @Atomic
@@ -284,9 +274,6 @@ public class Intruder extends Thread {
 		}
 	    };
 	    Packet r = Transaction.doIt(cmd);
-	    if (cmd.getAborts() > 0) {
-		abortsPacket.addAndGet(cmd.getAborts());
-	    }
 	    return r;
 	} catch (Exception e) {
 	    e.printStackTrace();
@@ -372,7 +359,7 @@ public class Intruder extends Thread {
 	long finish = System.currentTimeMillis();
 	long elapsed = finish - start;
 
-	System.out.println(elapsed + " " + Intruder.abortsComplete.get() + " " + Intruder.abortsProcess.get() + " " + Intruder.abortsPacket.get());
+	System.out.println(elapsed);
 
 	// finish
 	//

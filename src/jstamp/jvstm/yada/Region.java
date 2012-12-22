@@ -55,9 +55,6 @@ public class Region {
 		}
 	    };
 	    Long r = Transaction.doIt(cmd);
-	    if (cmd.getAborts() > 0) {
-		Yada.aborts.addAndGet(cmd.getAborts());
-	    }
 	    return r;
 	} catch (Exception e) {
 	    if (e instanceof RuntimeException) {
@@ -213,8 +210,5 @@ public class Region {
 	    }
 	};
 	Transaction.transactionallyDo(cmd);
-	if (cmd.getAborts() > 0) {
-	    Yada.aborts.addAndGet(cmd.getAborts());
-	}
     }
 }

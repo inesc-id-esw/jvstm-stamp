@@ -129,8 +129,6 @@ public class SSCA2 extends Thread {
 	}
     }   
 
-    public static final AtomicInteger aborts = new AtomicInteger(0);
-    
     public static void main(String[] args) {
 	Transaction.beginInevitable();
 	/*
@@ -259,7 +257,7 @@ public class SSCA2 extends Thread {
 	} // ENABLE_KERNEL2 
 
 	total_stoptime=System.currentTimeMillis();
-	System.out.println((total_stoptime-total_starttime) + " " + aborts.get());
+	System.out.println((total_stoptime-total_starttime));
 
 
 	if (Kernel.ENABLE_KERNEL3()) {

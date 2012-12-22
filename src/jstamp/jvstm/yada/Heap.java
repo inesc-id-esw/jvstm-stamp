@@ -106,9 +106,6 @@ public class Heap {
 		}
 	    };
 	    Element r = Transaction.doIt(cmd);
-	    if (cmd.getAborts() > 0) {
-		Yada.aborts.addAndGet(cmd.getAborts());
-	    }
 	    return r;
 	} catch (Exception e) {
 	    e.printStackTrace();

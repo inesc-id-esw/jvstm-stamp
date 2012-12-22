@@ -123,8 +123,6 @@ public class Learner {
     public static final int  OPERATION_REVERSE = 2;
     public static final int  NUM_OPERATION = 3;
 
-    public static final AtomicInteger aborts = new AtomicInteger(0);
-
     Adtree adtreePtr;
     Net netPtr;
     final VBoxFloat[] localBaseLogLikelihoods;
@@ -274,9 +272,6 @@ public class Learner {
 	    }
 	};
 	Transaction.transactionallyDo(cmd);
-	if (cmd.getAborts() > 0) {
-	    aborts.addAndGet(cmd.getAborts());
-	}
 
 
 	/*
@@ -371,9 +366,6 @@ public class Learner {
 			}
 		    };
 		    status = Transaction.doIt(cmdC);
-		    if (cmdC.getAborts() > 0) {
-			aborts.addAndGet(cmdC.getAborts());
-		    }
 		} catch (Exception e) {
 		    e.printStackTrace();
 		    System.exit(-1);
@@ -1043,9 +1035,6 @@ public class Learner {
 		    }
 		};
 		taskPtr = Transaction.doIt(cmdL);
-		if (cmdL.getAborts() > 0) {
-		    aborts.addAndGet(cmdL.getAborts());
-		}
 	    } catch (Exception e) {
 		e.printStackTrace();
 		System.exit(-1);
@@ -1077,9 +1066,6 @@ public class Learner {
 			    }
 			};
 			deltaLogLikelihood += Transaction.doIt(cmdF);
-			if (cmdF.getAborts() > 0) {
-			    aborts.addAndGet(cmdF.getAborts());
-			}
 		    } catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
@@ -1092,9 +1078,6 @@ public class Learner {
 			}
 		    };
 		    Transaction.transactionallyDo(cmd);
-		    if (cmd.getAborts() > 0) {
-			aborts.addAndGet(cmd.getAborts());
-		    }
 
 		} else if(op == OPERATION_REMOVE) {
 		    try {
@@ -1108,9 +1091,6 @@ public class Learner {
 			    }
 			};
 			deltaLogLikelihood += Transaction.doIt(cmdF);
-			if (cmdF.getAborts() > 0) {
-			    aborts.addAndGet(cmdF.getAborts());
-			}
 		    } catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
@@ -1123,9 +1103,6 @@ public class Learner {
 			}
 		    };
 		    Transaction.transactionallyDo(cmd);
-		    if (cmd.getAborts() > 0) {
-			aborts.addAndGet(cmd.getAborts());
-		    }
 
 		} else if(op == OPERATION_REVERSE) {
 		    try {
@@ -1139,9 +1116,6 @@ public class Learner {
 			    }
 			};
 			deltaLogLikelihood += Transaction.doIt(cmdF);
-			if (cmdF.getAborts() > 0) {
-			    aborts.addAndGet(cmdF.getAborts());
-			}
 		    } catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
@@ -1158,9 +1132,6 @@ public class Learner {
 			    }
 			};
 			deltaLogLikelihood += Transaction.doIt(cmdF);
-			if (cmdF.getAborts() > 0) {
-			    aborts.addAndGet(cmdF.getAborts());
-			}
 		    } catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
@@ -1195,9 +1166,6 @@ public class Learner {
 		    }
 		};
 		bestTask = Transaction.doIt(cmdL);
-		if (cmdL.getAborts() > 0) {
-		    aborts.addAndGet(cmdL.getAborts());
-		}
 	    } catch (Exception e) {
 		e.printStackTrace();
 		System.exit(-1);
@@ -1220,9 +1188,6 @@ public class Learner {
 		    }
 		};
 		newTask = Transaction.doIt(cmdL);
-		if (cmdL.getAborts() > 0) {
-		    aborts.addAndGet(cmdL.getAborts());
-		}
 	    } catch (Exception e) {
 		e.printStackTrace();
 		System.exit(-1);
@@ -1241,9 +1206,6 @@ public class Learner {
 		    }
 		};
 		newTask = Transaction.doIt(cmdL);
-		if (cmdL.getAborts() > 0) {
-		    aborts.addAndGet(cmdL.getAborts());
-		}
 	    } catch (Exception e) {
 		e.printStackTrace();
 		System.exit(-1);
@@ -1262,9 +1224,6 @@ public class Learner {
 		    }
 		};
 		newTask = Transaction.doIt(cmdL);
-		if (cmdL.getAborts() > 0) {
-		    aborts.addAndGet(cmdL.getAborts());
-		}
 	    } catch (Exception e) {
 		e.printStackTrace();
 		System.exit(-1);
@@ -1286,9 +1245,6 @@ public class Learner {
 		    }
 		};
 		Transaction.transactionallyDo(cmd);
-		if (cmd.getAborts() > 0) {
-		    aborts.addAndGet(cmd.getAborts());
-		}
 	    }
 
 	} // while (tasks) 
@@ -1327,9 +1283,6 @@ public class Learner {
 		}
 	    };
 	    boolean b =Transaction.doIt(cmdL);
-	    if (cmdL.getAborts() > 0) {
-		aborts.addAndGet(cmdL.getAborts());
-	    }
 	    return b;
 	} catch (Exception e) {
 	    e.printStackTrace();

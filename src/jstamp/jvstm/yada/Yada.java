@@ -7,8 +7,6 @@ import jvstm.Transaction;
 
 public class Yada {
 
-    public static final AtomicInteger aborts = new AtomicInteger(0);
-
     public static int numBuckets = 10000;
     static String global_inputPrefix = "";
     static long global_numThread = 1;
@@ -137,7 +135,7 @@ public class Yada {
 
 	//	System.out.println(" done.");
 
-	System.out.println(System.currentTimeMillis() - initTime + " " + aborts.get());
+	System.out.println(System.currentTimeMillis() - initTime);
 
 	/*
 	 * Check solution

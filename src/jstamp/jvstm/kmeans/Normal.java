@@ -161,8 +161,6 @@ public class Normal {
 	}
     }
 
-    public static final AtomicInteger aborts = new AtomicInteger(0);
-
     //  @Atomic
     private static void atomicMethodThree(final GlobalArgs args, final float delta) {
 	CommandCollectAborts cmd = new CommandCollectAborts() {
@@ -172,9 +170,6 @@ public class Normal {
 	    }
 	};
 	Transaction.transactionallyDo(cmd);
-	if (cmd.getAborts() > 0) {
-	    aborts.addAndGet(cmd.getAborts());
-	}
     }
 
     //  @Atomic
@@ -191,9 +186,6 @@ public class Normal {
 		}
 	    };
 	    int r = Transaction.doIt(cmd);
-	    if (cmd.getAborts() > 0) {
-		aborts.addAndGet(cmd.getAborts());
-	    }
 	    return r;
 	} catch (Exception e) {
 	    e.printStackTrace();
@@ -217,9 +209,6 @@ public class Normal {
 	    }
 	};
 	Transaction.transactionallyDo(cmd);
-	if (cmd.getAborts() > 0) {
-	    aborts.addAndGet(cmd.getAborts());
-	}
     }
 
     /* =============================================================================

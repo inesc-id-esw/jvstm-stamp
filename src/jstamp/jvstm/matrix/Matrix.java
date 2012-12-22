@@ -20,8 +20,6 @@ public class Matrix extends Thread{
 	this.y1 = y1;
     }
 
-    public static final AtomicInteger aborts = new AtomicInteger(0);
-    
     // @Atomic
     public void run() {
 	CommandCollectAborts cmd = new CommandCollectAborts() {
@@ -39,9 +37,6 @@ public class Matrix extends Thread{
 	    }
 	};
 	Transaction.transactionallyDo(cmd);
-	if (cmd.getAborts() > 0) {
-	    aborts.addAndGet(cmd.getAborts());
-	}
     }
 
     public static void main(String[] args) {
@@ -115,7 +110,7 @@ Transaction.beginInevitable();
 
 //	System.out.print("Finished\n");
 	long diff=stop-start;
-	System.out.println(diff + " " + aborts.get());
+	System.out.println(diff);
     }
 }
 

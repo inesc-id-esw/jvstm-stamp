@@ -49,9 +49,6 @@ public class MakeReservationOperation extends Operation {
 	    }
 	};
 	Transaction.transactionallyDo(cmd);
-	if (cmd.getAborts() > 0) {
-	    Vacation.aborts.addAndGet(cmd.getAborts());
-	}
     }
 
     private void makeReservationNotNested() {

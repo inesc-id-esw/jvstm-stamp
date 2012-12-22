@@ -555,9 +555,6 @@ public class ComputeGraph {
 	    }
 	};
 	Transaction.transactionallyDo(cmd);
-	if (cmd.getAborts() > 0) {
-	    SSCA2.aborts.addAndGet(cmd.getAborts());
-	}
     }
 
     //  @Atomic
@@ -570,9 +567,6 @@ public class ComputeGraph {
 	    }
 	};
 	Transaction.transactionallyDo(cmd);
-	if (cmd.getAborts() > 0) {
-	    SSCA2.aborts.addAndGet(cmd.getAborts());
-	}
     }
 }
 

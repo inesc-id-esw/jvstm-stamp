@@ -343,7 +343,7 @@ public class Bayes extends Thread {
 	long stop=System.currentTimeMillis();
 
 	long diff=stop-start;
-	System.out.println(diff + " " + Learner.aborts.get());
+	System.out.println(diff);
 
 //	System.out.println("done.");
 	

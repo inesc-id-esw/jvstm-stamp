@@ -127,7 +127,7 @@ public class Genome extends Thread {
 	}
 	long stop=System.currentTimeMillis();
 	long diff=stop-start;
-	System.out.println(diff + " " + Sequencer.aborts1.get() + " " + Sequencer.aborts2.get() + " " + Sequencer.aborts3.get() + " " + Sequencer.aborts4.get() + " " + Sequencer.aborts5.get());
+	System.out.println(diff);
 //	System.out.println("done.");
 Transaction.beginInevitable();
 	/* Check result */
