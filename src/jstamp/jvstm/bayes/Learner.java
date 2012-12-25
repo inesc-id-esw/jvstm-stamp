@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import jstamp.jvstm.CallableCollectAborts;
 import jstamp.jvstm.CommandCollectAborts;
+import jvstm.PerTxBox;
 import jvstm.Transaction;
 import jvstm.TransactionalCommand;
 import jvstm.VBoxFloat;
@@ -129,9 +130,19 @@ public class Learner {
     Net netPtr;
     final VBoxFloat[] localBaseLogLikelihoods;
     final VBoxFloat baseLogLikelihood;
+    final PerTxBox<Float> baseLogLikelihood_inc = new PerTxBox<Float>(0.0f) {
+	public void commit(Float value) {
+	    baseLogLikelihood.put(baseLogLikelihood.get() + value);
+	};
+    };
     LearnerTask[] tasks;
     List taskListPtr;
     final VBoxInt numTotalParent;
+    final PerTxBox<Integer> numTotalParent_inc = new PerTxBox<Integer>(0) {
+	public void commit(Integer value) {
+	    numTotalParent.put(numTotalParent.get() + value);
+	};
+    };
     int global_insertPenalty;
     int global_maxNumEdgeLearned;
     float global_operationQualityFactor;
@@ -269,8 +280,12 @@ public class Learner {
 	final float baseLogLikelihoodFinal = baseLogLikelihood;
 	CommandCollectAborts cmd = new CommandCollectAborts() {
 	    public void runTx() {
-		float globalBaseLogLikelihood = learnerPtr.baseLogLikelihood.getFloat();
-		learnerPtr.baseLogLikelihood.put((baseLogLikelihoodFinal + globalBaseLogLikelihood));
+		if (Bayes.usePerTxBoxes) {
+		    learnerPtr.baseLogLikelihood_inc.put(learnerPtr.baseLogLikelihood_inc.get() + baseLogLikelihoodFinal);
+		} else {
+		    float globalBaseLogLikelihood = learnerPtr.baseLogLikelihood.getFloat();
+		    learnerPtr.baseLogLikelihood.put((baseLogLikelihoodFinal + globalBaseLogLikelihood));
+		}
 	    }
 	};
 	Transaction.transactionallyDo(cmd);
@@ -1087,8 +1102,13 @@ public class Learner {
 
 		    CommandCollectAborts cmd = new CommandCollectAborts() {
 			public void runTx() {
-			    int numTotalParent = learnerPtr.numTotalParent.getInt();
-			    learnerPtr.numTotalParent.put(numTotalParent + 1);
+			    if (Bayes.usePerTxBoxes) {
+				int numTotalParent = learnerPtr.numTotalParent_inc.get();
+				learnerPtr.numTotalParent_inc.put(numTotalParent + 1);
+			    } else {
+				int numTotalParent = learnerPtr.numTotalParent.getInt();
+				learnerPtr.numTotalParent.put(numTotalParent + 1);
+			    }
 			}
 		    };
 		    Transaction.transactionallyDo(cmd);
@@ -1118,8 +1138,13 @@ public class Learner {
 
 		    CommandCollectAborts cmd = new CommandCollectAborts() {
 			public void runTx() {
-			    int numTotalParent = learnerPtr.numTotalParent.getInt();
-			    learnerPtr.numTotalParent.put(numTotalParent - 1);
+			    if (Bayes.usePerTxBoxes) {
+				int numTotalParent = learnerPtr.numTotalParent_inc.get();
+				learnerPtr.numTotalParent_inc.put(numTotalParent - 1);
+			    } else {
+				int numTotalParent = learnerPtr.numTotalParent.getInt();
+				learnerPtr.numTotalParent.put(numTotalParent - 1);
+			    }
 			}
 		    };
 		    Transaction.transactionallyDo(cmd);

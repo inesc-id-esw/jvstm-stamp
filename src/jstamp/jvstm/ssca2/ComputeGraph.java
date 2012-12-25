@@ -1,6 +1,7 @@
 package jstamp.jvstm.ssca2;
 
 import jstamp.jvstm.CommandCollectAborts;
+import jvstm.PerTxBox;
 import jvstm.Transaction;
 import jvstm.VBoxInt;
 
@@ -57,6 +58,11 @@ public class ComputeGraph {
     public int[] global_p;
     public VBoxInt global_maxNumVertices;
     public VBoxInt global_outVertexListSize;
+    public PerTxBox<Integer> global_outVertexListSize_inc = new PerTxBox<Integer>(0) {
+	public void commit(Integer value) {
+	    global_outVertexListSize.put(global_outVertexListSize.get() + value);
+	}
+    };
     public int[][] global_impliedEdgeList;
     public int[][] global_auxArr;
 
@@ -551,7 +557,11 @@ public class ComputeGraph {
     private static void atomicMethodTwo(final ComputeGraph computeGraphArgs, final int outVertexListSize) {
 	CommandCollectAborts cmd = new CommandCollectAborts() {
 	    public void runTx() {
-		computeGraphArgs.global_outVertexListSize.put(computeGraphArgs.global_outVertexListSize.get() + outVertexListSize);
+		if (SSCA2.usePerTxBoxes) {
+		    computeGraphArgs.global_outVertexListSize_inc.put(computeGraphArgs.global_outVertexListSize_inc.get() + outVertexListSize);
+		} else {
+		    computeGraphArgs.global_outVertexListSize.put(computeGraphArgs.global_outVertexListSize.get() + outVertexListSize);
+		}
 	    }
 	};
 	Transaction.transactionallyDo(cmd);

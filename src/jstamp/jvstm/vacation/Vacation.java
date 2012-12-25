@@ -62,6 +62,8 @@ public class Vacation {
 		Operation.numberParallelSiblings = Integer.parseInt(argv[++i]);
 	    else if (arg.equals("-updatePar"))
 		Operation.parallelizeUpdateTables = Boolean.parseBoolean(argv[++i]);
+	    else if (arg.equals("-ptb"))
+		Operation.usePerTxBoxes = true;
 	    else
 		opterr++;
 	}

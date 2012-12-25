@@ -311,6 +311,8 @@ Transaction.commit();
       }
   }
 
+  public static boolean usePerTxBoxes = false;
+  
   public static void parseCmdLine(String args[], KMeans km) {
     int i = 0;
     String arg;
@@ -345,6 +347,8 @@ Transaction.commit();
         }
       } else if(arg.equals("-h")) {
         km.usage();
+      } else if(arg.equals("-ptb")) {
+	  usePerTxBoxes = true;
       }
     }
     if(km.nthreads == 0 || km.filename == null) {

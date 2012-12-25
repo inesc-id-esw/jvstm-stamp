@@ -76,6 +76,7 @@ public class Bayes extends Thread {
     public static final int PARAM_DEFAULT_SEED = 1;
     public static final int PARAM_DEFAULT_THREAD = 1;
     public static final int PARAM_DEFAULT_VAR = 32;
+    public static boolean usePerTxBoxes = false;
 
     public int[] global_params; /* 256 = ascii limit */
     public int global_maxNumEdgeLearned;
@@ -191,6 +192,8 @@ public class Bayes extends Thread {
 		}
 	    } else if(arg.equals("-h")) {
 		b.displayUsage();
+	    } else if (arg.equals("-ptb")) {
+		Bayes.usePerTxBoxes  = true;
 	    }
 	}
 

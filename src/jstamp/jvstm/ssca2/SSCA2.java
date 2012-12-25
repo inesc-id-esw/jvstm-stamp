@@ -48,6 +48,8 @@ import jvstm.Transaction;
  */
 
 public class SSCA2 extends Thread {
+    public static boolean usePerTxBoxes = false;
+
     /*
      * Tuple for Scalable Data Generation
      * stores startVertex, endVertex, long weight and other info

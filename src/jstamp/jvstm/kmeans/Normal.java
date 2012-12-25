@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import jstamp.jvstm.CallableCollectAborts;
 import jstamp.jvstm.CommandCollectAborts;
+import jvstm.PerTxBox;
 import jvstm.Transaction;
 import jvstm.TransactionalCommand;
 import jvstm.VBoxFloat;
@@ -119,6 +120,8 @@ public class Normal {
 	float[][] clusters = args.clusters;
 	VBoxInt[] new_centers_len = args.new_centers_len;
 	VBoxFloat[][] new_centers = args.new_centers;
+	PerTxBox<Integer>[] new_centers_len_inc = args.new_centers_len_inc;
+	PerTxBox<Float>[][] new_centers_inc = args.new_centers_inc;
 	float delta = 0.0f;
 	int index, start, stop;
 
@@ -145,7 +148,7 @@ public class Normal {
 		membership[i] = index;
 
 		/* Update new cluster centers : sum of objects located within */
-		atomicMethodOne(feature, nfeatures, new_centers_len, new_centers, index, i);
+		atomicMethodOne(feature, nfeatures, new_centers_len, new_centers, new_centers_len_inc, new_centers_inc, index, i);
 	    }
 
 	    /* Update task queue */
@@ -168,7 +171,11 @@ public class Normal {
 	CommandCollectAborts cmd = new CommandCollectAborts() {
 	    @Override
 	    public void runTx() {
-		args.global_delta.put(args.global_delta.get() + delta);
+		if (KMeans.usePerTxBoxes) {
+		    args.global_delta_inc.put(args.global_delta_inc.get() + delta);
+		} else {
+		    args.global_delta.put(args.global_delta.get() + delta);
+		}
 	    }
 	};
 	Transaction.transactionallyDo(cmd);
@@ -180,21 +187,20 @@ public class Normal {
     //  @Atomic
     private static int atomicMethodTwo(final GlobalArgs args, final int CHUNK) {
 	try {
-	    CallableCollectAborts<Integer> cmd = new CallableCollectAborts<Integer>() {
-		public Integer runTx() {
-		    int start;
-		    {
-			start = args.global_i.getInt();
-			args.global_i.put(start + CHUNK);
+	    CommandCollectAborts cmd = new CommandCollectAborts() {
+		public void runTx() {
+		    if (KMeans.usePerTxBoxes) {
+			args.global_i_inc.put(args.global_i_inc.get() + CHUNK);
+		    } else {
+			args.global_i.put(args.global_i.get() + CHUNK);
 		    }
-		    return start;
 		}
 	    };
-	    int r = Transaction.doIt(cmd);
+	    Transaction.transactionallyDo(cmd);
 	    if (cmd.getAborts() > 0) {
 		aborts.addAndGet(cmd.getAborts());
 	    }
-	    return r;
+	    return args.global_i.getInt() - CHUNK;
 	} catch (Exception e) {
 	    e.printStackTrace();
 	    System.exit(-1);
@@ -204,14 +210,23 @@ public class Normal {
 
     //  @Atomic
     private static void atomicMethodOne(final float[][] feature, final int nfeatures,
-	    final VBoxInt[] new_centers_len, final VBoxFloat[][] new_centers, final int index, final int i) {
+	    final VBoxInt[] new_centers_len, final VBoxFloat[][] new_centers, 
+	    final PerTxBox<Integer>[] new_centers_len_inc, final PerTxBox<Float>[][] new_centers_inc, 
+	    final int index, final int i) {
 	CommandCollectAborts cmd = new CommandCollectAborts() {
 	    @Override
 	    public void runTx() {
 		{
-		    new_centers_len[index].put(new_centers_len[index].get() + 1);
-		    for (int j = 0; j < nfeatures; j++) {
-			new_centers[index][j].putFloat(new_centers[index][j].getFloat() + feature[i][j]);
+		    if (KMeans.usePerTxBoxes) {
+			new_centers_len_inc[index].put(new_centers_len_inc[index].get() + 1);
+			for (int j = 0; j < nfeatures; j++) {
+			    new_centers_inc[index][j].put(new_centers_inc[index][j].get() + feature[i][j]);
+			}
+		    } else {
+			new_centers_len[index].put(new_centers_len[index].get() + 1);
+			for (int j = 0; j < nfeatures; j++) {
+			    new_centers[index][j].putFloat(new_centers[index][j].getFloat() + feature[i][j]);
+			}
 		    }
 		}
 	    }
@@ -263,13 +278,19 @@ public class Normal {
 
 	VBoxFloat[][] new_centers = new VBoxFloat[nclusters][nfeatures];
 
+	PerTxBox<Integer>[] new_centers_len_inc = new PerTxBox[nclusters];
+
+	PerTxBox<Float>[][] new_centers_inc = new PerTxBox[nclusters][nfeatures];
+
 	Transaction.beginInevitable();
 	for (int k = 0; k < new_centers_len.length; k++) {
 	    new_centers_len[k] = new VBoxInt(0);
+	    new_centers_len_inc[k] = args.createNewCentersLenPerTxBox(k);
 	}
 	for (int i = 0; i < new_centers.length; i++) {
 	    for (int k = 0; k < new_centers[i].length; k++) {
 		new_centers[i][k] = new VBoxFloat(0.0f);
+		new_centers_inc[i][k] = args.createNewCentersPerTxBox(i, k);
 	    }
 	}
 	Transaction.commit();
@@ -288,6 +309,8 @@ public class Normal {
 	    args.clusters        = clusters;
 	    args.new_centers_len = new_centers_len;
 	    args.new_centers     = new_centers;
+	    args.new_centers_len_inc = new_centers_len_inc;
+	    args.new_centers_inc     = new_centers_inc;
 
 	    args.global_i.put(nthreads * CHUNK);
 	    args.global_delta.put(delta);

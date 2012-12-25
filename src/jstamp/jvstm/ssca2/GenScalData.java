@@ -1,6 +1,7 @@
 package jstamp.jvstm.ssca2;
 
 import jstamp.jvstm.CommandCollectAborts;
+import jvstm.PerTxBox;
 import jvstm.Transaction;
 import jvstm.VBoxInt;
 
@@ -60,7 +61,17 @@ public class GenScalData {
     public int[] global_i_edgeStartCounter;
     public int[] global_i_edgeEndCounter;
     public final VBoxInt global_edgeNum;
+    public PerTxBox<Integer> global_edgeNum_inc = new PerTxBox<Integer>(0) {
+	public void commit(Integer value) {
+	    global_edgeNum.put(global_edgeNum.get() + value);
+	}
+    };
     public final VBoxInt global_numStrWtEdges;
+    public PerTxBox<Integer> global_numStrWtEdges_inc = new PerTxBox<Integer>(0) {
+	public void commit(Integer value) {
+	    global_numStrWtEdges.put(global_numStrWtEdges.get() + value);
+	}
+    };
     public int[] global_startVertex;
     public int[] global_endVertex;
     public int[] global_tempIndex;
@@ -1479,7 +1490,11 @@ Barrier.enterBarrier();
     private static void atomicMethodSix(final GenScalData gsd, final int numStrWtEdges) {
 	CommandCollectAborts cmd = new CommandCollectAborts() {
 	    public void runTx() {
-		gsd.global_numStrWtEdges.put(gsd.global_numStrWtEdges.get() + numStrWtEdges);
+		if (SSCA2.usePerTxBoxes) {
+		    gsd.global_numStrWtEdges_inc.put(gsd.global_numStrWtEdges_inc.get() + numStrWtEdges);
+		} else {
+		    gsd.global_numStrWtEdges.put(gsd.global_numStrWtEdges.get() + numStrWtEdges);
+		}
 	    }
 	};
 	Transaction.transactionallyDo(cmd);
@@ -1492,7 +1507,11 @@ Barrier.enterBarrier();
     private static void atomicMethodFive(final GenScalData gsd, final int i_edgePtr) {
 	CommandCollectAborts cmd = new CommandCollectAborts() {
 	    public void runTx() {
-		gsd.global_edgeNum.put(gsd.global_edgeNum.get() + i_edgePtr);
+		if (SSCA2.usePerTxBoxes) {
+		    gsd.global_edgeNum_inc.put(gsd.global_edgeNum_inc.get() + i_edgePtr);
+		} else {
+		    gsd.global_edgeNum.put(gsd.global_edgeNum.get() + i_edgePtr);
+		}
 	    }
 	};
 	Transaction.transactionallyDo(cmd);

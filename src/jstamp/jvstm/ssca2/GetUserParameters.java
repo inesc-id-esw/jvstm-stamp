@@ -145,6 +145,8 @@ public class GetUserParameters {
           }
         } else if(arg.equals("-h")) {
           displayUsage();
+        } else if(arg.equals("-ptb")) {
+            SSCA2.usePerTxBoxes = true;
         }
       }
 
